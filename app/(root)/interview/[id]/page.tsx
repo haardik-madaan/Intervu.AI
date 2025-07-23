@@ -12,7 +12,7 @@ interface RouteParams {
 }
 
 const page = async ({ params }: RouteParams) => {
-  const { id } = params;
+  const { id } = await params;
   const user = await getCurrentUser();
   const interview = await getInterviewsById(id);
 

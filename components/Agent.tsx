@@ -64,7 +64,7 @@ const Agent = ({userName,userId,type,interviewId, questions} : AgentProps) => {
         })
 
         if(success && id){
-            router.push('/interview/{interviewId}/feedback')
+            router.push(`/interview/${interviewId}/feedback`)
         }
         else{
             console.log('Error saving the feedback');
@@ -85,33 +85,35 @@ const Agent = ({userName,userId,type,interviewId, questions} : AgentProps) => {
 
     const handleCall = async () => {
         setCallStatus(CallStatus.CONNECTING);
-
-        if(type === 'generate'){
-            await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-                variableValues : {
-                    username : userName,
-                    userid: userId,
     
-                }
-            })
-
-        }
-        else{
-            let formattedQuestions = '';
-
-            if(questions){
-                formattedQuestions = questions.map((question) => `-${question}`)
-                .join('\n');
+        if (type === "generate") {
+          await vapi.start(
+            undefined,
+            undefined,
+            undefined,
+            process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!,
+            {
+              variableValues: {
+                username: userName,
+                userid: userId,
+              },
             }
-            await vapi.start('interviewer',{
-                variableValues:{
-                    questions: formattedQuestions
-                }
-            })
+          );
+        } else {
+          let formattedQuestions = "";
+          if (questions) {
+            formattedQuestions = questions
+              .map((question) => `- ${question}`)
+              .join("\n");
+          }
+    
+          await vapi.start(interviewer, {
+            variableValues: {
+              questions: formattedQuestions,
+            },
+          });
         }
-
-    }
-
+      };
     const handleDisconnect = async () => {
         setCallStatus(CallStatus.FINISHED);
         vapi.stop();
