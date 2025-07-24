@@ -1,18 +1,18 @@
 import { getRandomInterviewCover } from "@/lib/utils";
-import {google} from "@ai-sdk/google";
+import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin";
-import {generateText} from 'ai'
+import { generateText } from "ai";
 
 export async function GET() {
-    return Response.json({success : true, data :'THANK YOU!'},{status:200});
+    return Response.json({ success: true, data: "THANK YOU!" }, { status: 200 });
 }
 
-export async function POST(request : Request){
-    const { type, role, level, techstack, amount, userid} = await request.json();
+export async function POST(request: Request) {
+    const { type, role, level, techstack, amount, userid } = await request.json();
 
-    try{
-        const { text : questions } = await generateText({
-            model : google('gemini-2.0-flash-001'),
+    try {
+        const { text: questions } = await generateText({
+            model: google("gemini-2.0-flash-001"),
             prompt: `Prepare questions for a job interview.
         The job role is ${role}.
         The job experience level is ${level}.
@@ -25,20 +25,23 @@ export async function POST(request : Request){
         ["Question 1", "Question 2", "Question 3"]
         
         Thank you! <3`
-        })
+        });
         const interview = {
-            role, type, level, techstack : techstack.split(','),
+            role,
+            type,
+            level,
+            techstack: techstack.split(","),
             questions: JSON.parse(questions),
-            userId: userid, finalized: true,
+            userId: userid,
+            finalized: true,
             coverImage: getRandomInterviewCover(),
-            createdAt : new Date().toISOString()
-        }
-        await db.collection("interviews").add(interview);
-        return Response.json({success : true}, {status : 300});
-    }
-    catch(error){
+            createdAt: new Date().toISOString(),
+        };
+        const docRef = await db.collection("interviews").add(interview);
+        return Response.json({ success: true, id: docRef.id }, { status: 200 });
+    } catch (error) {
         console.error(error);
 
-        return Response.json({success : false, error} , {status : 500});
+        return Response.json({ success: false, error }, { status: 500 });
     }
 }
