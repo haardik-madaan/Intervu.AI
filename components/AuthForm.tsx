@@ -121,7 +121,7 @@ const AuthForm = ({type} : {type : FormType}) => {
         <FormField control={form.control} name="password" label="Password" placeholder="Your password" description = "Password must contain atleast 8 characters." type="password"/>
 
         <Button className="btn" type="submit">{isSignIn ? 'Sign in' : 'Create an Account'}</Button>
-        <Button type="submit">Submit</Button>
+       
       </form>
     </Form>
     <p className="text-center">{isSignIn ? 'No account yet?' : 'Have an account already?'}
